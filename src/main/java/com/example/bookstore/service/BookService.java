@@ -5,9 +5,12 @@ import com.example.bookstore.dto.InsertBookDTO;
 import com.example.bookstore.entity.Book;
 import com.example.bookstore.repository.BookRepository;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,6 +23,7 @@ import java.util.UUID;
 public class BookService {
     private final BookRepository bookRepository;
     private final ModelMapper modelMapper;
+    public static final Logger logger = LoggerFactory.getLogger(BookService.class);
 
     @Autowired
     public BookService(BookRepository bookRepository, ModelMapper modelMapper) {
@@ -37,20 +41,29 @@ public class BookService {
         return bookRepository.findById(bookId);
     }
 
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
+    }
+
     public Optional<Book> updateBookById(UUID bookId, InsertBookDTO updatedBookDTO) {
-        Optional<Book> optionalBook = bookRepository.findById(bookId);
+        try {
+            Optional<Book> optionalBook = bookRepository.findById(bookId);
 
-        if (optionalBook.isPresent()) {
-            Book existingBook = optionalBook.get();
+            if (optionalBook.isPresent()) {
+                Book existingBook = optionalBook.get();
 
-            existingBook.setName(updatedBookDTO.getName());
-            existingBook.setAuthor(updatedBookDTO.getAuthor());
-            existingBook.setDescription(updatedBookDTO.getDescription());
-            existingBook.setPrice(updatedBookDTO.getPrice());
+                existingBook.setName(updatedBookDTO.getName());
+                existingBook.setAuthor(updatedBookDTO.getAuthor());
+                existingBook.setDescription(updatedBookDTO.getDescription());
+                existingBook.setPrice(updatedBookDTO.getPrice());
 
-            return Optional.of(bookRepository.save(existingBook));
-        } else {
-            return Optional.empty();
+                return Optional.of(bookRepository.save(existingBook));
+            } else {
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            logger.error("Error updating book with ID " + bookId, e);
+            throw new RuntimeException("Error updating book with ID " + bookId, e);
         }
     }
 
