@@ -75,10 +75,25 @@ public class BookService {
         }
     }
 
+    public List<Book> findBooksByNameContaining(String partOfName) {
+        return bookRepository.findByNameContaining(partOfName);
+    }
+
+    public List<Book> findBooksByAuthorContaining(String author) {
+        return bookRepository.findByAuthorContaining(author);
+    }
+
+    public List<Book> findBooksByOrderByPriceAsc() {
+        return bookRepository.findBooksByOrderByPriceAsc();
+    }
+
+    public List<Book> findBooksByOrderByPriceDesc() {
+        return bookRepository.findBooksByOrderByPriceDesc();
+    }
+
     public void deleteById(UUID bookId) {
         bookRepository.deleteById(bookId);
     }
-
 
     public BookDTO mapToDTO(Book book) {
         return modelMapper.map(book, BookDTO.class);

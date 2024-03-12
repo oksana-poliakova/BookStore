@@ -2,6 +2,7 @@ package com.example.bookstore.controller;
 
 import com.example.bookstore.dto.BookDTO;
 import com.example.bookstore.dto.InsertBookDTO;
+import com.example.bookstore.entity.Book;
 import com.example.bookstore.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -52,9 +53,33 @@ public class BookController {
         return bookService.mapToDTO(bookService.updateBookById(bookId, insertBookDTO).get());
     }
 
-    @DeleteMapping("/deleteBookById")
+    @GetMapping("/searchByName")
+    @Operation(summary = "Possibility to search books by name")
+    public List<Book> searchBooksByName(@RequestParam String partOfName) {
+        return bookService.findBooksByNameContaining(partOfName);
+    }
+
+    @GetMapping("/searchByAuthor")
+    @Operation(summary = "Possibility to search books by author")
+    public List<Book> searchBookByAuthor(@RequestParam String author) {
+        return bookService.findBooksByAuthorContaining(author);
+    }
+
+    @GetMapping("/sortBookByPriceAsc")
+    @Operation(summary = "Possibility to sort books by price asc")
+    public List<Book> findBooksByPriceAsc() {
+        return bookService.findBooksByOrderByPriceAsc();
+    }
+
+    @GetMapping("/sortBookByPriceDesc")
+    @Operation(summary = "Possibility to sort books by price asc")
+    public List<Book> findBooksByPriceDesc() {
+        return bookService.findBooksByOrderByPriceDesc();
+    }
+
+    @DeleteMapping("/deleteBookById/{bookId}")
     @Operation(summary = "Possibility to delete a book by id")
-    public void deleteBookById(UUID bookId) {
+    public void deleteBookById(@PathVariable("bookId") UUID bookId) {
         bookService.deleteById(bookId);
     }
 }
