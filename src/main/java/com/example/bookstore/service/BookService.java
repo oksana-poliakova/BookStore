@@ -52,10 +52,18 @@ public class BookService {
             if (optionalBook.isPresent()) {
                 Book existingBook = optionalBook.get();
 
-                existingBook.setName(updatedBookDTO.getName());
-                existingBook.setAuthor(updatedBookDTO.getAuthor());
-                existingBook.setDescription(updatedBookDTO.getDescription());
-                existingBook.setPrice(updatedBookDTO.getPrice());
+                if (updatedBookDTO.getName() != null) {
+                    existingBook.setName(updatedBookDTO.getName());
+                }
+                if (updatedBookDTO.getAuthor() != null) {
+                    existingBook.setAuthor(updatedBookDTO.getAuthor());
+                }
+                if (updatedBookDTO.getDescription() != null) {
+                    existingBook.setDescription(updatedBookDTO.getDescription());
+                }
+                if (updatedBookDTO.getPrice() != null) {
+                    existingBook.setPrice(updatedBookDTO.getPrice());
+                }
 
                 return Optional.of(bookRepository.save(existingBook));
             } else {
