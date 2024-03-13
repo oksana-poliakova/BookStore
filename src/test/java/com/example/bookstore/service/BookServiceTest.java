@@ -1,5 +1,6 @@
 package com.example.bookstore.service;
 
+import com.example.bookstore.dto.BookDTO;
 import com.example.bookstore.dto.InsertBookDTO;
 import com.example.bookstore.entity.Book;
 import com.example.bookstore.factory.BookFactory;
@@ -46,7 +47,7 @@ class BookServiceTest {
         when(bookRepository.findAll()).thenReturn(books);
         var result = bookService.getAllBooks();
 
-        assertEquals(2, result.size());
+        assertEquals(4, result.size());
         assertEquals("Book1", result.get(0).getName());
         assertEquals("Author1", result.get(0).getAuthor());
         assertEquals("Description1", result.get(0).getDescription());
@@ -86,22 +87,124 @@ class BookServiceTest {
     }
 
     @Test
-    public void findBooksByNameContaining() {
+    public void testUpdateBookById() {
+        UUID bookId = UUID.randomUUID();
+        InsertBookDTO updatedBookDTO = new InsertBookDTO();
+        updatedBookDTO.setName("Updated Book");
+        updatedBookDTO.setAuthor("Updated Author");
+        updatedBookDTO.setDescription("Updated Description");
+        updatedBookDTO.setPrice(20.00);
+
+        Book existingBook = new Book();
+        existingBook.setId(bookId);
+        existingBook.setName("Existing Book");
+        existingBook.setAuthor("Existing Author");
+        existingBook.setDescription("Existing Description");
+        existingBook.setPrice(10.00);
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
+        when(bookRepository.save(any(Book.class))).thenReturn(existingBook);
+
+        Optional<Book> updatedBook = bookService.updateBookById(bookId, updatedBookDTO);
+
+        assertTrue(updatedBook.isPresent());
+        assertEquals(updatedBookDTO.getName(), updatedBook.get().getName());
+        assertEquals(updatedBookDTO.getAuthor(), updatedBook.get().getAuthor());
+        assertEquals(updatedBookDTO.getDescription(), updatedBook.get().getDescription());
+        assertEquals(updatedBookDTO.getPrice(), updatedBook.get().getPrice());
+    }
+
+    @Test
+    public void testFindBooksByNameContaining() {
         Book book1 = BookFactory.createBook("Java Basic", "Herbert Schildt", "Java for beginners", 35.00);
         Book book2 = BookFactory.createBook("Java Advanced", "Bruce Eckel", "Java for advanced programmers", 45.00);
         Book book3 = BookFactory.createBook("test", "Bruce Eckel", "test for advanced programmers", 45.00);
+        Book book4 = BookFactory.createBook("Clean Code", "Robert C. Martin", "A Handbook of Agile Software Craftsmanship", 50.00);
 
         List<Book> booksContainingJava = Arrays.asList(book1, book2);
         List<Book> booksContainingTest = List.of(book3);
+        List<Book> allBooks = Arrays.asList(book1, book2, book3, book4);
 
         when(bookRepository.findByNameContaining("Java")).thenReturn(booksContainingJava);
         when(bookRepository.findByNameContaining("test")).thenReturn(booksContainingTest);
+        when(bookRepository.findByNameContaining("")).thenReturn(allBooks); // all books
 
         List<Book> actualBooksContainingJava = bookService.findBooksByNameContaining("Java");
         List<Book> actualBooksContainingTest = bookService.findBooksByNameContaining("test");
+        List<Book> actualAllBooks = bookService.findBooksByNameContaining("");
 
         assertEquals(2, actualBooksContainingJava.size());
         assertEquals(1, actualBooksContainingTest.size());
+        assertEquals(4, actualAllBooks.size());
     }
 
+    @Test
+    public void testDeleteById() {
+        Book book = new Book();
+        UUID bookId = UUID.randomUUID();
+
+        lenient().when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        bookService.deleteById(bookId);
+
+        verify(bookRepository, times(1)).deleteById(bookId);
+    }
+
+    @Test
+    public void testFindBooksByAuthorContaining() {
+        Book book1 = BookFactory.createBook("Java Basic", "Test", "Java for beginners", 35.00);
+        Book book2 = BookFactory.createBook("Java Advanced", "Bruce Eckel", "Java for advanced programmers", 45.00);
+        Book book3 = BookFactory.createBook("Test", "Test", "test for advanced programmers", 45.00);
+        Book book4 = BookFactory.createBook("Clean Code", "Robert C. Martin", "A Handbook of Agile Software Craftsmanship", 50.00);
+        Book book5 = BookFactory.createBook("Java Basic", "Bruce Eckel", "Java for beginner programmers", 35.00);
+
+        List<Book> booksContainingTestAuthor = Arrays.asList(book1, book5);
+
+        when(bookRepository.findByAuthorContaining("Test")).thenReturn(booksContainingTestAuthor);
+
+        List<Book> actualBooksContainingTestAuthor = bookService.findBooksByAuthorContaining("Test");
+
+        assertEquals(2, booksContainingTestAuthor.size());
+    }
+
+    @Test
+    public void testFindBooksByOrderByPriceAsc() {
+        List<Book> books = BookFactory.createBooks();
+
+        when(bookRepository.findBooksByOrderByPriceAsc()).thenReturn(books);
+
+        List<Book> actualBooks = bookService.findBooksByOrderByPriceAsc();
+
+        assertEquals(books, actualBooks);
+    }
+
+    @Test
+    public void testFindBooksByOrderByPriceDesc() {
+        List<Book> books = BookFactory.createBooks();
+
+        when(bookRepository.findBooksByOrderByPriceDesc()).thenReturn(books);
+
+        List<Book> actualBooks = bookService.findBooksByOrderByPriceDesc();
+
+        assertEquals(books, actualBooks);
+    }
+
+    @Test
+    public void testMapToDTO() {
+        Book book = new Book();
+        book.setName("Test Book");
+        book.setAuthor("Test Author");
+        book.setDescription("Test Description");
+        book.setPrice(10.00);
+
+        BookDTO expectedBookDTO = new BookDTO();
+        expectedBookDTO.setName("Test Book");
+        expectedBookDTO.setAuthor("Test Author");
+        expectedBookDTO.setDescription("Test Description");
+        expectedBookDTO.setPrice(10.00);
+
+        when(modelMapper.map(book, BookDTO.class)).thenReturn(expectedBookDTO);
+        BookDTO actualBookDTO = bookService.mapToDTO(book);
+
+        assertEquals(expectedBookDTO, actualBookDTO);
+    }
 }
