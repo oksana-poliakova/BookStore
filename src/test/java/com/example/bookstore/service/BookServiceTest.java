@@ -5,6 +5,7 @@ import com.example.bookstore.dto.InsertBookDTO;
 import com.example.bookstore.entity.Book;
 import com.example.bookstore.factory.BookFactory;
 import com.example.bookstore.repository.BookRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -115,6 +116,34 @@ class BookServiceTest {
     }
 
     @Test
+    public void testUpdateBookById_InvalidId() {
+        UUID invalidBookId = UUID.randomUUID();
+        InsertBookDTO updatedBookDto = new InsertBookDTO();
+
+        updatedBookDto.setName("Updated Title");
+
+        EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
+            bookService.updateBookById(invalidBookId, updatedBookDto);
+        });
+
+        assertEquals(entityNotFoundException.getMessage(), "Invalid id: " + invalidBookId);
+        verify(bookRepository, never()).save(any());
+    }
+
+    @Test
+    public void testUpdateBookById_NullId() {
+        InsertBookDTO updatedBookDto = new InsertBookDTO();
+        updatedBookDto.setName("Updated Title");
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            bookService.updateBookById(null, updatedBookDto);
+        });
+
+        assertNotNull(nullPointerException);
+        verify(bookRepository, never()).save(any());
+    }
+
+    @Test
     public void testFindBooksByNameContaining() {
         Book book1 = BookFactory.createBook("Java Basic", "Herbert Schildt", "Java for beginners", 35.00);
         Book book2 = BookFactory.createBook("Java Advanced", "Bruce Eckel", "Java for advanced programmers", 45.00);
@@ -147,6 +176,15 @@ class BookServiceTest {
         bookService.deleteById(bookId);
 
         verify(bookRepository, times(1)).deleteById(bookId);
+    }
+
+    @Test
+    public void testDeleteById_InvalidId() {
+        assertThrows(NullPointerException.class, () -> {
+            bookService.deleteById(null);
+        });
+
+        verify(bookRepository, never()).deleteById(null);
     }
 
     @Test

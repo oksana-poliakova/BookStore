@@ -4,6 +4,7 @@ import com.example.bookstore.dto.BookDTO;
 import com.example.bookstore.dto.InsertBookDTO;
 import com.example.bookstore.entity.Book;
 import com.example.bookstore.repository.BookRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,33 +47,24 @@ public class BookService {
     }
 
     public Optional<Book> updateBookById(UUID bookId, InsertBookDTO updatedBookDTO) {
-        try {
-            Optional<Book> optionalBook = bookRepository.findById(bookId);
+        if (bookId == null) throw new NullPointerException();
 
-            if (optionalBook.isPresent()) {
-                Book existingBook = optionalBook.get();
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundException("Invalid id: " + bookId));
 
-                if (updatedBookDTO.getName() != null) {
-                    existingBook.setName(updatedBookDTO.getName());
-                }
-                if (updatedBookDTO.getAuthor() != null) {
-                    existingBook.setAuthor(updatedBookDTO.getAuthor());
-                }
-                if (updatedBookDTO.getDescription() != null) {
-                    existingBook.setDescription(updatedBookDTO.getDescription());
-                }
-                if (updatedBookDTO.getPrice() != null) {
-                    existingBook.setPrice(updatedBookDTO.getPrice());
-                }
-
-                return Optional.of(bookRepository.save(existingBook));
-            } else {
-                return Optional.empty();
-            }
-        } catch (Exception e) {
-            logger.error("Error updating book with ID " + bookId, e);
-            throw new RuntimeException("Error updating book with ID " + bookId, e);
+        if (updatedBookDTO.getName() != null) {
+            book.setName(updatedBookDTO.getName());
         }
+        if (updatedBookDTO.getAuthor() != null) {
+            book.setAuthor(updatedBookDTO.getAuthor());
+        }
+        if (updatedBookDTO.getDescription() != null) {
+            book.setDescription(updatedBookDTO.getDescription());
+        }
+        if (updatedBookDTO.getPrice() != null) {
+            book.setPrice(updatedBookDTO.getPrice());
+        }
+
+        return Optional.of(bookRepository.save(book));
     }
 
     public List<Book> findBooksByNameContaining(String partOfName) {
@@ -92,6 +84,7 @@ public class BookService {
     }
 
     public void deleteById(UUID bookId) {
+        if (bookId == null) throw new NullPointerException();
         bookRepository.deleteById(bookId);
     }
 
