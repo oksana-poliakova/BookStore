@@ -67,6 +67,10 @@ public class BookService {
         return Optional.of(bookRepository.save(book));
     }
 
+    public Optional<Book> findBookByName(String name) {
+        return bookRepository.findBookByName(name);
+    }
+
     public List<Book> findBooksByNameContaining(String partOfName) {
         return bookRepository.findByNameContaining(partOfName);
     }

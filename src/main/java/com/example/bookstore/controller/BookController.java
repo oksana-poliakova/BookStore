@@ -4,12 +4,20 @@ import com.example.bookstore.dto.BookDTO;
 import com.example.bookstore.dto.InsertBookDTO;
 import com.example.bookstore.entity.Book;
 import com.example.bookstore.service.BookService;
+import com.example.bookstore.validation.BookCreate;
+import com.example.bookstore.validation.BookUpdate;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -19,6 +27,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/book")
+@Validated
 public class BookController {
     private final BookService bookService;
 
@@ -27,6 +36,7 @@ public class BookController {
         this.bookService = bookService;
     }
 
+    @Validated({BookCreate.class})
     @PostMapping("/add")
     @Operation(summary = "Possibility to add a book to the database")
     public BookDTO save(@Valid @RequestBody InsertBookDTO insertBookDTO) {
@@ -47,9 +57,10 @@ public class BookController {
         return books.stream().map(bookService::mapToDTO).toList();
     }
 
+    @Validated({BookUpdate.class})
     @PutMapping("/updateBookById/{bookId}")
     @Operation(summary = "Possibility to update a book by id")
-    public BookDTO updateBookById(@PathVariable("bookId") UUID bookId, InsertBookDTO insertBookDTO) {
+    public BookDTO updateBookById(@PathVariable("bookId") UUID bookId, @Valid InsertBookDTO insertBookDTO) {
         return bookService.mapToDTO(bookService.updateBookById(bookId, insertBookDTO).get());
     }
 
@@ -57,6 +68,12 @@ public class BookController {
     @Operation(summary = "Possibility to search books by name")
     public List<Book> searchBooksByName(@RequestParam String partOfName) {
         return bookService.findBooksByNameContaining(partOfName);
+    }
+
+    @GetMapping("/getBookByName")
+    @Operation(summary = "Possibility to get book by name")
+    public BookDTO getBookByName(@RequestParam String name) {
+        return bookService.mapToDTO(bookService.findBookByName(name).orElseThrow(() -> new EntityNotFoundException("Book with this name not found")));
     }
 
     @GetMapping("/searchByAuthor")

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
@@ -185,6 +184,12 @@ class BookServiceTest {
         });
 
         verify(bookRepository, never()).deleteById(null);
+    }
+
+    /** TODO: Write the test */
+    @Test
+    public void testFindBookByName() {
+
     }
 
     @Test
