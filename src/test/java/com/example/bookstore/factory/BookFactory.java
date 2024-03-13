@@ -15,14 +15,18 @@ public class BookFactory {
 
         Book book1 = createBook("Book1", "Author1", "Description1", 10.00);
         Book book2 = createBook("Book2", "Author2", "Description2", 20.00);
+        Book book3 = createBook("Java Basic", "Herbert Schildt", "Java for beginners", 35.00);
+        Book book4 = createBook("Java Advanced", "Bruce Eckel", "Java for advanced programmers", 45.00);
 
         books.add(book1);
         books.add(book2);
+        books.add(book3);
+        books.add(book4);
 
         return books;
     }
 
-    private static Book createBook(String name, String author, String description, double price) {
+    public static Book createBook(String name, String author, String description, double price) {
         Book book = new Book();
         book.setName(name);
         book.setAuthor(author);

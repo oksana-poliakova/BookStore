@@ -2,17 +2,18 @@ package com.example.bookstore.service;
 
 import com.example.bookstore.dto.InsertBookDTO;
 import com.example.bookstore.entity.Book;
+import com.example.bookstore.factory.BookFactory;
 import com.example.bookstore.repository.BookRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -33,21 +34,14 @@ class BookServiceTest {
     @InjectMocks
     BookService bookService;
 
+    @BeforeEach
+    void init() {
+        bookService = new BookService(bookRepository, modelMapper);
+    }
+
     @Test
     void getAllBooksSuccess() {
-        var book1 = new Book();
-        book1.setName("Book1");
-        book1.setAuthor("Author1");
-        book1.setDescription("Description1");
-        book1.setPrice(10.00);
-
-        var book2 = new Book();
-        book2.setName("Book2");
-        book2.setAuthor("Author2");
-        book2.setDescription("Description2");
-        book2.setPrice(20.00);
-
-        var books = List.of(book1, book2);
+        List<Book> books = BookFactory.createBooks();
 
         when(bookRepository.findAll()).thenReturn(books);
         var result = bookService.getAllBooks();
@@ -93,9 +87,21 @@ class BookServiceTest {
 
     @Test
     public void findBooksByNameContaining() {
+        Book book1 = BookFactory.createBook("Java Basic", "Herbert Schildt", "Java for beginners", 35.00);
+        Book book2 = BookFactory.createBook("Java Advanced", "Bruce Eckel", "Java for advanced programmers", 45.00);
+        Book book3 = BookFactory.createBook("test", "Bruce Eckel", "test for advanced programmers", 45.00);
 
+        List<Book> booksContainingJava = Arrays.asList(book1, book2);
+        List<Book> booksContainingTest = List.of(book3);
+
+        when(bookRepository.findByNameContaining("Java")).thenReturn(booksContainingJava);
+        when(bookRepository.findByNameContaining("test")).thenReturn(booksContainingTest);
+
+        List<Book> actualBooksContainingJava = bookService.findBooksByNameContaining("Java");
+        List<Book> actualBooksContainingTest = bookService.findBooksByNameContaining("test");
+
+        assertEquals(2, actualBooksContainingJava.size());
+        assertEquals(1, actualBooksContainingTest.size());
     }
-
-
 
 }
