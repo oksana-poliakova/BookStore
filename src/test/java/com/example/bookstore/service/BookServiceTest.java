@@ -186,10 +186,18 @@ class BookServiceTest {
         verify(bookRepository, never()).deleteById(null);
     }
 
-    /** TODO: Write the test */
     @Test
     public void testFindBookByName() {
+        String title = "Title";
+        Book expectedBook = new Book();
+        expectedBook.setName(title);
 
+        when(bookRepository.findBookByName(title)).thenReturn(Optional.of(expectedBook));
+        Optional<Book> foundBookOptional = bookService.findBookByName(title);
+
+        assertTrue(foundBookOptional.isPresent());
+        assertEquals(expectedBook, foundBookOptional.get());
+        verify(bookRepository, times(1)).findBookByName(title);
     }
 
     @Test
