@@ -4,8 +4,7 @@ import com.example.bookstore.dto.BookDTO;
 import com.example.bookstore.dto.InsertBookDTO;
 import com.example.bookstore.entity.Book;
 import com.example.bookstore.service.BookService;
-import com.example.bookstore.validation.BookCreate;
-import com.example.bookstore.validation.BookUpdate;
+
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -36,7 +35,6 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    @Validated({BookCreate.class})
     @PostMapping("/add")
     @Operation(summary = "Possibility to add a book to the database")
     public BookDTO save(@Valid @RequestBody InsertBookDTO insertBookDTO) {
@@ -57,7 +55,6 @@ public class BookController {
         return books.stream().map(bookService::mapToDTO).toList();
     }
 
-    @Validated({BookUpdate.class})
     @PutMapping("/updateBookById/{bookId}")
     @Operation(summary = "Possibility to update a book by id")
     public BookDTO updateBookById(@PathVariable("bookId") UUID bookId, @Valid InsertBookDTO insertBookDTO) {
