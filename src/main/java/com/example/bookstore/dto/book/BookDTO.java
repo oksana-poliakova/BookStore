@@ -1,4 +1,4 @@
-package com.example.bookstore.dto;
+package com.example.bookstore.dto.book;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotEmpty;

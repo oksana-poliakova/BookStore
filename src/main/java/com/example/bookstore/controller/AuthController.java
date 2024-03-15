@@ -1,8 +1,8 @@
 package com.example.bookstore.controller;
 
-import com.example.bookstore.api.requests.LoginRequest;
-import com.example.bookstore.api.requests.RegisterRequest;
-import com.example.bookstore.api.responses.AuthResponse;
+import com.example.bookstore.dto.auth.LoginRequestDTO;
+import com.example.bookstore.dto.auth.RegisterRequestDTO;
+import com.example.bookstore.dto.auth.ResponseTokenDTO;
 import com.example.bookstore.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +29,13 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Possibility to register an user")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<ResponseTokenDTO> register(@RequestBody RegisterRequestDTO request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
     @Operation(summary = "Possibility to login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<ResponseTokenDTO> login(@RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(authService.login(request));
     }
 }

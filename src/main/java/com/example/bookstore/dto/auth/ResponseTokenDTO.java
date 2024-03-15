@@ -1,7 +1,7 @@
-package com.example.bookstore.api.requests;
+package com.example.bookstore.dto.auth;
 
+import com.example.bookstore.dto.UserDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,11 +9,13 @@ import lombok.NoArgsConstructor;
  * @author oksanapoliakova on 15.03.2024
  * @projectName BookStore
  */
+
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginRequest {
-    private String username;
-    private String password;
+public class ResponseTokenDTO {
+
+    private UserDTO user;
+    private String token;
+    private Integer accessTokenValidTime;
 }

@@ -1,8 +1,8 @@
 package com.example.bookstore.service;
 
-import com.example.bookstore.api.requests.LoginRequest;
-import com.example.bookstore.api.requests.RegisterRequest;
-import com.example.bookstore.api.responses.AuthResponse;
+import com.example.bookstore.dto.auth.LoginRequestDTO;
+import com.example.bookstore.dto.auth.RegisterRequestDTO;
+import com.example.bookstore.dto.auth.ResponseTokenDTO;
 import com.example.bookstore.entity.Role;
 import com.example.bookstore.entity.User;
 import com.example.bookstore.repository.UserRepository;
@@ -21,32 +21,29 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JWTService jwtService;
+    private final JWTTokenService jwtService;
     private final AuthenticationManager authenticationManager;
 
     @Autowired
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JWTService jwtService, AuthenticationManager authenticationManager) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JWTTokenService jwtService, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthResponse register(RegisterRequest request) {
+    public ResponseTokenDTO register(RegisterRequestDTO request) {
         var user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
         userRepository.save(user);
-        var jwt = jwtService.generateToken(user);
-        return AuthResponse.builder()
-                .token(jwt)
-                .build();
+        return jwtService.generateTokens(user);
     }
 
-    public AuthResponse login(LoginRequest request) {
+    public ResponseTokenDTO login(LoginRequestDTO request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
@@ -54,9 +51,6 @@ public class AuthService {
                 )
         );
         var user = userRepository.findUserByUsername(request.getUsername()).orElseThrow();
-        var jwt = jwtService.generateToken(user);
-        return AuthResponse.builder()
-                .token(jwt)
-                .build();
+        return jwtService.generateTokens(user);
     }
 }

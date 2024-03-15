@@ -1,7 +1,7 @@
 package com.example.bookstore.service;
 
-import com.example.bookstore.dto.BookDTO;
-import com.example.bookstore.dto.InsertBookDTO;
+import com.example.bookstore.dto.book.BookDTO;
+import com.example.bookstore.dto.book.InsertBookDTO;
 import com.example.bookstore.entity.Book;
 import com.example.bookstore.repository.BookRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,12 +24,14 @@ import java.util.UUID;
 public class BookService {
     private final BookRepository bookRepository;
     private final ModelMapper modelMapper;
+    private final UserService userService;
     public static final Logger logger = LoggerFactory.getLogger(BookService.class);
 
     @Autowired
-    public BookService(BookRepository bookRepository, ModelMapper modelMapper) {
+    public BookService(BookRepository bookRepository, ModelMapper modelMapper, UserService userService) {
         this.bookRepository = bookRepository;
         this.modelMapper = modelMapper;
+        this.userService = userService;
     }
 
     public Book saveBook(InsertBookDTO insertBookDTO) {
@@ -39,6 +41,9 @@ public class BookService {
     }
 
     public Optional<Book> getBookById(UUID bookId) {
+        userService.getAuthentificatedUser();
+
+
         return bookRepository.findById(bookId);
     }
 

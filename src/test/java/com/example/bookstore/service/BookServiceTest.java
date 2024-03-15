@@ -1,7 +1,7 @@
 package com.example.bookstore.service;
 
-import com.example.bookstore.dto.BookDTO;
-import com.example.bookstore.dto.InsertBookDTO;
+import com.example.bookstore.dto.book.BookDTO;
+import com.example.bookstore.dto.book.InsertBookDTO;
 import com.example.bookstore.entity.Book;
 import com.example.bookstore.factory.BookFactory;
 import com.example.bookstore.repository.BookRepository;
@@ -31,13 +31,15 @@ class BookServiceTest {
     BookRepository bookRepository;
     @Mock
     ModelMapper modelMapper;
+    @Mock
+    UserService userService;
 
     @InjectMocks
     BookService bookService;
 
     @BeforeEach
     void init() {
-        bookService = new BookService(bookRepository, modelMapper);
+        bookService = new BookService(bookRepository,modelMapper,userService);
     }
 
     @Test
