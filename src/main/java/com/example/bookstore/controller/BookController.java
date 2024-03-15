@@ -6,6 +6,7 @@ import com.example.bookstore.entity.Book;
 import com.example.bookstore.service.BookService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class BookController {
     }
 
     @GetMapping("/{bookId}")
-    @Operation(summary = "Possibility to get a book by id")
+    @Operation(summary = "Possibility to get a book by id", security = @SecurityRequirement(name = "bearerAuth"))
     public BookDTO getBookById(@PathVariable("bookId") UUID bookId) {
         var book = bookService.getBookById(bookId);
         return bookService.mapToDTO(book.get());

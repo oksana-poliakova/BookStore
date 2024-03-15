@@ -1,18 +1,19 @@
 package com.example.bookstore.config;
 
+import com.example.bookstore.filter.JWTFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * @author oksanapoliakova on 15.03.2024
@@ -21,28 +22,16 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user = User.builder()
-                .username("user")
-                .roles("USER")
-                .password(passwordEncoder().encode("pass"))
-                .build();
+    private final AuthenticationProvider authenticationProvider;
+    private final JWTFilter jwtFilter;
 
-        UserDetails admin = User.builder()
-                .username("admin")
-                .roles("ADMIN")
-                .password(passwordEncoder().encode("pass"))
-                .build();
-
-        return new InMemoryUserDetailsManager(user, admin);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    @Autowired
+    public SecurityConfig(AuthenticationProvider authenticationProvider, JWTFilter jwtFilter) {
+        this.authenticationProvider = authenticationProvider;
+        this.jwtFilter = jwtFilter;
     }
 
     @Bean
@@ -51,11 +40,12 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
                         req
-                                .requestMatchers("/book/getAllBooks").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers("/**").hasRole("ADMIN")
-                                .anyRequest().authenticated())
-                .formLogin(fromLogin -> fromLogin.defaultSuccessUrl("/book/getAllBooks"))
-                .logout(LogoutConfigurer::permitAll);
+                                .requestMatchers("/api/auth/**").permitAll()
+//                                .anyRequest().authenticated())
+                                .anyRequest().permitAll())
+                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
 }
