@@ -12,6 +12,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+/**
+ * The `JWTTokenService` class is responsible for generating and validating JWT tokens.
+ */
+
 @Service
 public class JWTTokenService {
     public static final String CLAIM_ROLE_AUTHORITY = "roleAuthority";
@@ -27,16 +31,16 @@ public class JWTTokenService {
         this.modelMapper = modelMapper;
     }
 
+    // Generating an access token with user ID and email as claims
     private String generateAccessToken(String userId, String userEmail) {
-
         return JWT.create().withSubject(userId)
                 .withClaim("email", userEmail)
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date((new Date()).getTime() + jwtExpirationMs))
                 .sign(Algorithm.HMAC512(jwtSecret));
-
     }
 
+    // Validating a JWT token
     public boolean validate(String token) {
         var validation = JWT.require(Algorithm.HMAC512(jwtSecret)).build();
         try {
@@ -47,13 +51,15 @@ public class JWTTokenService {
         }
     }
 
+    // Extracting the subject (user ID) from a JWT token
     public String getSubject(String token) {
         return JWT.decode(token).getSubject();
     }
+
+    // Generating tokens (access token) for a user
     public ResponseTokenDTO generateTokens(User user) {
         var accessToken = generateAccessToken(user.getId().toString(), user.getUsername());
         var userDTO = modelMapper.map(user, UserDTO.class);
         return new ResponseTokenDTO(userDTO, accessToken, jwtExpirationMs);
     }
-
 }

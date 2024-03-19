@@ -29,6 +29,10 @@ import org.springframework.web.cors.CorsConfigurationSource;
  * @projectName BookStore
  */
 
+/**
+ * * The `SecurityConfig` class configures the security settings, including the `JwtFilter`, `UserDetailsService`,
+ * `PasswordEncoder`, and defines the security rules for different URLs.
+ * */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -41,7 +45,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 @OpenAPIDefinition(servers = {@Server(url = "/", description = "DEV server")})
 public class SecurityConfig {
-
     private final JwtFilter jwtFilter;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
@@ -54,11 +57,13 @@ public class SecurityConfig {
         this.corsConfigurationSource = corsConfigurationSource;
     }
 
+    // Configuring the AuthenticationManagerBuilder with UserDetailsService and PasswordEncoder
     @Autowired
     public void config(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userService).passwordEncoder(passwordEncoder);
     }
 
+    // Security filter chain for configuring HTTP security, specifying which endpoints are secure
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -71,10 +76,7 @@ public class SecurityConfig {
                                         "/swagger-ui/**",
                                         "/v2/api-docs/**",
                                         "/swagger-resources/**").permitAll()
-                                // Vehicle endpoints
                                 .requestMatchers(HttpMethod.GET, "api/book/{bookId}").authenticated()
-//                                .requestMatchers(HttpMethod.GET, "api/vehicle/all").authenticated()
-                                // Require authentication for any other requests
                                 .anyRequest().authenticated()
                                 .and().httpBasic();
                     } catch (Exception e) {

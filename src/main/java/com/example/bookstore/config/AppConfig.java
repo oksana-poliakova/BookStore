@@ -27,16 +27,19 @@ public class AppConfig {
         this.userRepository = userRepository;
     }
 
+    // Defining a PasswordEncoder bean using BCryptPasswordEncoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // Defining a UserDetailsService bean that loads user by username
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findUserByUsername(username).orElseThrow();
     }
 
+    // Defining an AuthenticationProvider bean that uses UserDetailsService and PasswordEncoder
     @Bean
     public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService,
                                                          PasswordEncoder passwordEncoder) {
@@ -46,6 +49,7 @@ public class AppConfig {
         return provider;
     }
 
+    // Defining an AuthenticationManager bean
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

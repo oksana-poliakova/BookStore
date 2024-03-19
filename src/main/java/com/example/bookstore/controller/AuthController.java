@@ -17,6 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
  * @projectName BookStore
  */
 
+/**
+ * The `AuthController` class defines endpoints for user registration and login.
+ */
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

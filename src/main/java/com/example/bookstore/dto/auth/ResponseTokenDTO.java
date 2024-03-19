@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResponseTokenDTO {
-
     private UserDTO user;
     private String token;
     private Integer accessTokenValidTime;

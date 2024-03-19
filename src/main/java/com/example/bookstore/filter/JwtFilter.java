@@ -19,10 +19,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * The `JwtFilter` class is responsible for intercepting incoming requests, extracting the JWT token from the header,
+ * validating it, and setting the authentication in the security context.
+ */
+
 @Order(1)
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-
+    // Constants for JWT token handling
     private final String AUTH_HEADER = "Authorization";
     private final String PREFIX_TOKEN = "Bearer ";
 
@@ -35,6 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
         this.userService = userService;
     }
 
+    // Filtering the incoming request for JWT token validation
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -54,6 +60,7 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    // Extracting the JWT token from the request header
     private String getJWTToken(HttpServletRequest request) {
         String authenticationHeader = request.getHeader(AUTH_HEADER);
         if (authenticationHeader == null || !authenticationHeader.startsWith(PREFIX_TOKEN))

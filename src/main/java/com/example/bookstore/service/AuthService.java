@@ -17,6 +17,10 @@ import org.springframework.stereotype.Service;
  * @projectName BookStore
  */
 
+/**
+ * The `AuthService` class handles the user registration and login logic, using the `UserRepository`,
+ * `PasswordEncoder`, and `JWTTokenService`.
+ */
 @Service
 public class AuthService {
     private final UserRepository userRepository;
@@ -33,6 +37,7 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
+    // User registration logic
     public ResponseTokenDTO register(RegisterRequestDTO request) {
         var user = User.builder()
                 .username(request.getUsername())
@@ -43,6 +48,7 @@ public class AuthService {
         return jwtService.generateTokens(user);
     }
 
+    // User login logic
     public ResponseTokenDTO login(LoginRequestDTO request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
