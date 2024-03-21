@@ -10,6 +10,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +35,7 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    @PostMapping("/add")
+    @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Possibility to add a book to the database")
     public BookDTO save(@Valid @RequestBody InsertBookDTO insertBookDTO) {
         return bookService.mapToDTO(bookService.saveBook(insertBookDTO));
@@ -47,9 +50,10 @@ public class BookController {
 
     @GetMapping("/getAllBooks")
     @Operation(summary = "Possibility to get all books")
-    public List<BookDTO> getAllBooks() {
+    public ResponseEntity<List<BookDTO>> getAllBooks() {
         var books = bookService.getAllBooks();
-        return books.stream().map(bookService::mapToDTO).toList();
+        var allBooks = books.stream().map(bookService::mapToDTO).toList();
+        return new ResponseEntity<>(allBooks, HttpStatus.OK);
     }
 
     @PutMapping("/updateBookById/{bookId}")

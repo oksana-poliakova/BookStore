@@ -1,7 +1,11 @@
 package com.example.bookstore.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
 
 import java.util.UUID;
 
@@ -13,6 +17,10 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name = "book")
+@Builder
+@Jacksonized
+@AllArgsConstructor
+@NoArgsConstructor
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
