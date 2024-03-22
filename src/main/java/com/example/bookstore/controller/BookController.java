@@ -37,7 +37,6 @@ public class BookController {
 
     @PostMapping(value = "/add")
     @Operation(summary = "Possibility to add a book to the database")
-    // Void instead of BookDTO ???
     public ResponseEntity<Void> save(@Valid @RequestBody InsertBookDTO insertBookDTO) {
         bookService.mapToDTO(bookService.saveBook(insertBookDTO));
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -45,9 +44,10 @@ public class BookController {
 
     @GetMapping("/{bookId}")
     @Operation(summary = "Possibility to get a book by id", security = @SecurityRequirement(name = "bearerAuth"))
-    public BookDTO getBookById(@PathVariable("bookId") UUID bookId) {
+    public ResponseEntity<BookDTO> getBookById(@PathVariable("bookId") UUID bookId) {
         var book = bookService.getBookById(bookId);
-        return bookService.mapToDTO(book.get());
+        var retrievedBook = bookService.mapToDTO(book.get());
+        return new ResponseEntity<>(retrievedBook, HttpStatus.OK);
     }
 
     @GetMapping("/getAllBooks")
@@ -60,43 +60,50 @@ public class BookController {
 
     @PutMapping("/updateBookById/{bookId}")
     @Operation(summary = "Possibility to update a book by id")
-    public BookDTO updateBookById(@PathVariable("bookId") UUID bookId, @Valid InsertBookDTO insertBookDTO) {
-        return bookService.mapToDTO(bookService.updateBookById(bookId, insertBookDTO).get());
+    public ResponseEntity<BookDTO> updateBookById(@PathVariable("bookId") UUID bookId, @Valid InsertBookDTO insertBookDTO) {
+        var updatedBook = bookService.mapToDTO(bookService.updateBookById(bookId, insertBookDTO).get());
+        return new ResponseEntity<>(updatedBook, HttpStatus.OK);
     }
 
     @GetMapping("/searchByName")
     @Operation(summary = "Possibility to search books by name")
-    public List<Book> searchBooksByName(@RequestParam String partOfName) {
-        return bookService.findBooksByNameContaining(partOfName);
+    public ResponseEntity<List<Book>> searchBooksByName(@RequestParam String partOfName) {
+        var books = bookService.findBooksByNameContaining(partOfName);
+        return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @GetMapping("/getBookByName")
     @Operation(summary = "Possibility to get book by name")
-    public BookDTO getBookByName(@RequestParam String name) {
-        return bookService.mapToDTO(bookService.findBookByName(name).orElseThrow(() -> new EntityNotFoundException("Book with this name not found")));
+    public ResponseEntity<BookDTO> getBookByName(@RequestParam String name) {
+        var book = bookService.mapToDTO(bookService.findBookByName(name).orElseThrow(() -> new EntityNotFoundException("Book with this name not found")));
+        return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
     @GetMapping("/searchByAuthor")
     @Operation(summary = "Possibility to search books by author")
-    public List<Book> searchBookByAuthor(@RequestParam String author) {
-        return bookService.findBooksByAuthorContaining(author);
+    public ResponseEntity<List<Book>> searchBookByAuthor(@RequestParam String author) {
+        var books = bookService.findBooksByAuthorContaining(author);
+        return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @GetMapping("/sortBookByPriceAsc")
     @Operation(summary = "Possibility to sort books by price asc")
-    public List<Book> findBooksByPriceAsc() {
-        return bookService.findBooksByOrderByPriceAsc();
+    public ResponseEntity<List<Book>> findBooksByPriceAsc() {
+        var sortedBooks = bookService.findBooksByOrderByPriceAsc();
+        return new ResponseEntity<>(sortedBooks, HttpStatus.OK);
     }
 
     @GetMapping("/sortBookByPriceDesc")
     @Operation(summary = "Possibility to sort books by price asc")
-    public List<Book> findBooksByPriceDesc() {
-        return bookService.findBooksByOrderByPriceDesc();
+    public ResponseEntity<List<Book>> findBooksByPriceDesc() {
+        var sortedBooks = bookService.findBooksByOrderByPriceDesc();
+        return new ResponseEntity<>(sortedBooks, HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteBookById/{bookId}")
     @Operation(summary = "Possibility to delete a book by id")
-    public void deleteBookById(@PathVariable("bookId") UUID bookId) {
+    public ResponseEntity<Void> deleteBookById(@PathVariable("bookId") UUID bookId) {
         bookService.deleteById(bookId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
