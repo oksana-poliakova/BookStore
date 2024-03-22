@@ -95,6 +95,21 @@ class BookControllerTest {
     }
 
     @Test
+    void getBookByAuthor() throws Exception {
+        String author = "Author";
+        Book book = new Book();
+        book.setAuthor(author);
+        List listOfBooks = List.of(book);
+
+        when(bookService.findBooksByAuthorContaining(anyString())).thenReturn(listOfBooks);
+
+        mockMvc.perform(get("/api/book/searchByAuthor")
+                        .param("author", author)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void findBookByPartOfNameEndpointTest() throws Exception {
         String bookName = "Book2";
         Book book = new Book();
@@ -157,4 +172,15 @@ class BookControllerTest {
                         .content(bookJson))
                 .andExpect(status().isCreated());
     }
+
+    @Test
+    void deleteBookByIdEndpointTest() throws Exception {
+        UUID bookId = UUID.randomUUID();
+
+        mockMvc.perform(delete("/api/book/deleteBookById/{bookId}", bookId))
+                .andExpect(status().isOk());
+
+        verify(bookService, times(1)).deleteById(eq(bookId));
+    }
+
 }
