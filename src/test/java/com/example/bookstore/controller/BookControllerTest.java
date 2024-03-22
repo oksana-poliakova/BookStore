@@ -3,6 +3,7 @@ package com.example.bookstore.controller;
 import com.example.bookstore.dto.book.BookDTO;
 import com.example.bookstore.dto.book.InsertBookDTO;
 import com.example.bookstore.entity.Book;
+import com.example.bookstore.repository.BookRepository;
 import com.example.bookstore.service.BookService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,14 +20,19 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -39,6 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureTestDatabase
 @ExtendWith(MockitoExtension.class)
 class BookControllerTest {
     @Mock
@@ -55,6 +62,7 @@ class BookControllerTest {
 
     @BeforeEach
     void setUp() {
+        bookController = new BookController(bookService);
         mockMvc = MockMvcBuilders.standaloneSetup(bookController).build();
         objectMapper = new ObjectMapper();
     }
@@ -62,6 +70,40 @@ class BookControllerTest {
     @Test
     void getAllBooksEndpointTest() throws Exception {
         mockMvc.perform(get("/api/book/getAllBooks")).andExpect(status().isOk());
+    }
+
+    @Test
+    void sortBookByPriceAscEndpointTest() throws Exception {
+        mockMvc.perform(get("/api/book/sortBookByPriceAsc")).andExpect(status().isOk());
+    }
+
+    @Test
+    void getBookByNameEndpointTest() throws Exception {
+        // Prepare test data
+        String bookName = "Book2";
+        Book bookDTO = new Book();
+        bookDTO.setName(bookName);
+
+        // Mock the behavior of the bookService
+        when(bookService.findBookByName(anyString())).thenReturn(Optional.of(bookDTO));
+
+        // Perform GET request to the endpoint
+        mockMvc.perform(get("/api/book/getBookByName")
+                        .param("name", bookName)
+                        .contentType(MediaType.APPLICATION_JSON))
+                // Validate the response
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getBookByNameWhenNoParamTest() throws Exception {
+        this.mockMvc.perform(get("/api/book/getBookByName"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void sortBookByPriceDescEndpointTest() throws Exception {
+        mockMvc.perform(get("/api/book/sortBookByPriceDesc"));
     }
 
     @Test
