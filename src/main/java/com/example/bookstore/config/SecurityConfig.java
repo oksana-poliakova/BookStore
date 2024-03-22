@@ -10,15 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -59,7 +56,7 @@ public class SecurityConfig {
 
     // Configuring the AuthenticationManagerBuilder with UserDetailsService and PasswordEncoder
     @Autowired
-    public void config(AuthenticationManagerBuilder auth) throws Exception {
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userService).passwordEncoder(passwordEncoder);
     }
 
@@ -67,16 +64,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                // Configuring authorization rules for endpoints
                 .authorizeHttpRequests(ahr -> {
                     try {
                         ahr
+                                // Permitting access to certain URLs without authentication
                                 .requestMatchers("/h2-console/**",
                                         "/auth/**",
                                         "/v3/api-docs/**",
                                         "/swagger-ui/**",
                                         "/v2/api-docs/**",
                                         "/swagger-resources/**").permitAll()
+                                // Requiring authentication for specific endpoints
                                 .requestMatchers(HttpMethod.GET, "api/book/{bookId}").authenticated()
+                                // Requiring authentication for any other requests
                                 .anyRequest().authenticated()
                                 .and().httpBasic();
                     } catch (Exception e) {

@@ -32,13 +32,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @Operation(summary = "Possibility to register an user")
+    @Operation(summary = "Register a new user")
     public ResponseEntity<ResponseTokenDTO> register(@RequestBody RegisterRequestDTO request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Possibility to login")
+    @Operation(summary = "Login as an existing user")
     public ResponseEntity<ResponseTokenDTO> login(@RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(authService.login(request));
     }

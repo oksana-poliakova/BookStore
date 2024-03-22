@@ -36,7 +36,7 @@ public class AppConfig {
     // Defining a UserDetailsService bean that loads user by username
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findUserByUsername(username).orElseThrow();
+        return username -> userRepository.findByUsername(username).orElseThrow();
     }
 
     // Defining an AuthenticationProvider bean that uses UserDetailsService and PasswordEncoder

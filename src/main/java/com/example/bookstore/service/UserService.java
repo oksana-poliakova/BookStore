@@ -17,7 +17,7 @@ import java.util.UUID;
  * @projectName BookStore
  */
 @Service
-public class UserService implements UserDetailsService {
+public final class UserService implements UserDetailsService {
 
     UserRepository userRepository;
     @Autowired
@@ -32,7 +32,7 @@ public class UserService implements UserDetailsService {
     public User getAuthenticatedUser() {
         try {
             var username = SecurityContextHolder.getContext().getAuthentication().getName();
-            return userRepository.findUserByUsername(username).orElseThrow(() -> new CustomException("User not found", HttpStatus.NOT_FOUND.value()));
+            return userRepository.findByUsername(username).orElseThrow(() -> new CustomException("User not found", HttpStatus.NOT_FOUND.value()));
         } catch (Exception e) {
             throw new CustomException("User not authenticated", HttpStatus.FORBIDDEN.value());
         }
@@ -41,7 +41,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
         try {
-            return userRepository.findUserByUsername(username).orElseThrow();
+            return userRepository.findByUsername(username).orElseThrow();
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
