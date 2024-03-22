@@ -43,7 +43,6 @@ public class BookService {
     public Optional<Book> getBookById(UUID bookId) {
         userService.getAuthentificatedUser();
 
-
         return bookRepository.findById(bookId);
     }
 
