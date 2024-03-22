@@ -18,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +32,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -91,6 +91,21 @@ class BookControllerTest {
         mockMvc.perform(get("/api/book/getBookByName")
                         .param("name", bookName)
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void findBookByPartOfNameEndpointTest() throws Exception {
+        String bookName = "Book2";
+        Book book = new Book();
+        book.setName(bookName);
+        List listOfBooks = List.of(book);
+
+        when(bookService.findBooksByNameContaining(anyString())).thenReturn(listOfBooks);
+
+        mockMvc.perform(get("/api/book/searchByName")
+                    .param("partOfName", bookName)
+                    .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 

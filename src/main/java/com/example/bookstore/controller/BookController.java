@@ -11,7 +11,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -67,7 +66,7 @@ public class BookController {
 
     @GetMapping("/searchByName")
     @Operation(summary = "Possibility to search books by name")
-    public ResponseEntity<List<Book>> searchBooksByName(@RequestParam String partOfName) {
+    public ResponseEntity<List<Book>> findBookByPartOfName(@RequestParam String partOfName) {
         var books = bookService.findBooksByNameContaining(partOfName);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
