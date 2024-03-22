@@ -7,6 +7,7 @@ import com.example.bookstore.repository.BookRepository;
 import com.example.bookstore.service.BookService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
+@Transactional
+
 @ExtendWith(MockitoExtension.class)
 class BookControllerTest {
     @Mock
@@ -79,19 +82,30 @@ class BookControllerTest {
 
     @Test
     void getBookByNameEndpointTest() throws Exception {
-        // Prepare test data
         String bookName = "Book2";
-        Book bookDTO = new Book();
-        bookDTO.setName(bookName);
+        Book book = new Book();
+        book.setName(bookName);
 
-        // Mock the behavior of the bookService
-        when(bookService.findBookByName(anyString())).thenReturn(Optional.of(bookDTO));
+        when(bookService.findBookByName(anyString())).thenReturn(Optional.of(book));
 
-        // Perform GET request to the endpoint
         mockMvc.perform(get("/api/book/getBookByName")
                         .param("name", bookName)
                         .contentType(MediaType.APPLICATION_JSON))
-                // Validate the response
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user", password = "pass")
+    void getBookByIdEndpointTest() throws Exception {
+        UUID bookId = UUID.randomUUID();
+
+        Book book = new Book();
+        book.setId(bookId);
+
+        when(bookService.getBookById(bookId)).thenReturn(Optional.of(book));
+
+        mockMvc.perform(get("/api/book/{bookId}", bookId)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
