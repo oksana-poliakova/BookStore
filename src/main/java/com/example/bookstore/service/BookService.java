@@ -41,7 +41,7 @@ public class BookService {
     }
 
     public Optional<Book> getBookById(UUID bookId) {
-        userService.getAuthentificatedUser();
+        userService.getAuthenticatedUser();
 
         return bookRepository.findById(bookId);
     }
@@ -84,11 +84,11 @@ public class BookService {
     }
 
     public List<Book> findBooksByOrderByPriceAsc() {
-        return bookRepository.findBooksByOrderByPriceAsc();
+        return bookRepository.findAllByOrderByPriceAsc();
     }
 
     public List<Book> findBooksByOrderByPriceDesc() {
-        return bookRepository.findBooksByOrderByPriceDesc();
+        return bookRepository.findAllByOrderByPriceDesc();
     }
 
     public void deleteById(UUID bookId) {

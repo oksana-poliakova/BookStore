@@ -17,7 +17,7 @@ import java.util.UUID;
 public interface BookRepository extends JpaRepository<Book, UUID> {
     List<Book> findByNameContaining(String partOfName);
     List<Book> findByAuthorContaining(String author);
-    List<Book> findBooksByOrderByPriceAsc();
-    List<Book> findBooksByOrderByPriceDesc();
+    List<Book> findAllByOrderByPriceAsc();
+    List<Book> findAllByOrderByPriceDesc();
     Optional<Book> findBookByName(String name);
 }

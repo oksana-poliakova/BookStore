@@ -223,7 +223,7 @@ class BookServiceTest {
     public void testFindBooksByOrderByPriceAsc() {
         List<Book> books = BookFactory.createBooks();
 
-        when(bookRepository.findBooksByOrderByPriceAsc()).thenReturn(books);
+        when(bookRepository.findAllByOrderByPriceAsc()).thenReturn(books);
 
         List<Book> actualBooks = bookService.findBooksByOrderByPriceAsc();
 
@@ -234,7 +234,7 @@ class BookServiceTest {
     public void testFindBooksByOrderByPriceDesc() {
         List<Book> books = BookFactory.createBooks();
 
-        when(bookRepository.findBooksByOrderByPriceDesc()).thenReturn(books);
+        when(bookRepository.findAllByOrderByPriceDesc()).thenReturn(books);
 
         List<Book> actualBooks = bookService.findBooksByOrderByPriceDesc();
 
