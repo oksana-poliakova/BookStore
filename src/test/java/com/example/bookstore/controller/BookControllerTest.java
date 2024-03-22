@@ -72,12 +72,12 @@ class BookControllerTest {
 
     @Test
     void getAllBooksEndpointTest() throws Exception {
-        mockMvc.perform(get("/api/book/getAllBooks")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/books/getAllBooks")).andExpect(status().isOk());
     }
 
     @Test
     void sortBookByPriceAscEndpointTest() throws Exception {
-        mockMvc.perform(get("/api/book/sortBookByPriceAsc")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/books/sortByPriceAsc")).andExpect(status().isOk());
     }
 
     @Test
@@ -88,7 +88,7 @@ class BookControllerTest {
 
         when(bookService.findBookByName(anyString())).thenReturn(Optional.of(book));
 
-        mockMvc.perform(get("/api/book/getBookByName")
+        mockMvc.perform(get("/api/books/getBookByName")
                         .param("name", bookName)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -103,7 +103,7 @@ class BookControllerTest {
 
         when(bookService.findBooksByAuthorContaining(anyString())).thenReturn(listOfBooks);
 
-        mockMvc.perform(get("/api/book/searchByAuthor")
+        mockMvc.perform(get("/api/books/searchByAuthor")
                         .param("author", author)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -118,7 +118,7 @@ class BookControllerTest {
 
         when(bookService.findBooksByNameContaining(anyString())).thenReturn(listOfBooks);
 
-        mockMvc.perform(get("/api/book/searchByName")
+        mockMvc.perform(get("/api/books/searchBooksByName")
                     .param("partOfName", bookName)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -134,20 +134,20 @@ class BookControllerTest {
 
         when(bookService.getBookById(bookId)).thenReturn(Optional.of(book));
 
-        mockMvc.perform(get("/api/book/{bookId}", bookId)
+        mockMvc.perform(get("/api/books/{bookId}", bookId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void getBookByNameWhenNoParamTest() throws Exception {
-        this.mockMvc.perform(get("/api/book/getBookByName"))
+        this.mockMvc.perform(get("/api/books/getBookByName"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void sortBookByPriceDescEndpointTest() throws Exception {
-        mockMvc.perform(get("/api/book/sortBookByPriceDesc"));
+        mockMvc.perform(get("/api/books/sortByPriceDesc"));
     }
 
     @Test
@@ -167,7 +167,7 @@ class BookControllerTest {
 
         String bookJson = objectMapper.writeValueAsString(savedBook);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/book/add")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/books/add")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(bookJson))
                 .andExpect(status().isCreated());
@@ -177,7 +177,7 @@ class BookControllerTest {
     void deleteBookByIdEndpointTest() throws Exception {
         UUID bookId = UUID.randomUUID();
 
-        mockMvc.perform(delete("/api/book/deleteBookById/{bookId}", bookId))
+        mockMvc.perform(delete("/api/books/delete/{bookId}", bookId))
                 .andExpect(status().isOk());
 
         verify(bookService, times(1)).deleteById(eq(bookId));

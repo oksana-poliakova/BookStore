@@ -24,7 +24,7 @@ import java.util.UUID;
  */
 
 @RestController
-@RequestMapping("api/book")
+@RequestMapping("/api/books")
 @Validated
 public class BookController {
     private final BookService bookService;
@@ -35,14 +35,14 @@ public class BookController {
     }
 
     @PostMapping(value = "/add")
-    @Operation(summary = "Possibility to add a book to the database")
-    public ResponseEntity<Void> save(@Valid @RequestBody InsertBookDTO insertBookDTO) {
+    @Operation(summary = "Add a book to the database")
+    public ResponseEntity<Void> addBook(@Valid @RequestBody InsertBookDTO insertBookDTO) {
         bookService.mapToDTO(bookService.saveBook(insertBookDTO));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/{bookId}")
-    @Operation(summary = "Possibility to get a book by id", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Get a book by ID", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<BookDTO> getBookById(@PathVariable("bookId") UUID bookId) {
         var book = bookService.getBookById(bookId);
         var retrievedBook = bookService.mapToDTO(book.get());
@@ -50,57 +50,57 @@ public class BookController {
     }
 
     @GetMapping("/getAllBooks")
-    @Operation(summary = "Possibility to get all books")
+    @Operation(summary = "Get all books")
     public ResponseEntity<List<BookDTO>> getAllBooks() {
         var books = bookService.getAllBooks();
         var allBooks = books.stream().map(bookService::mapToDTO).toList();
         return new ResponseEntity<>(allBooks, HttpStatus.OK);
     }
 
-    @PutMapping("/updateBookById/{bookId}")
-    @Operation(summary = "Possibility to update a book by id")
+    @PutMapping("/update/{bookId}")
+    @Operation(summary = "Update a book by ID")
     public ResponseEntity<BookDTO> updateBookById(@PathVariable("bookId") UUID bookId, @Valid InsertBookDTO insertBookDTO) {
         var updatedBook = bookService.mapToDTO(bookService.updateBookById(bookId, insertBookDTO).get());
         return new ResponseEntity<>(updatedBook, HttpStatus.OK);
     }
 
-    @GetMapping("/searchByName")
-    @Operation(summary = "Possibility to search books by name")
-    public ResponseEntity<List<Book>> findBookByPartOfName(@RequestParam String partOfName) {
+    @GetMapping("/searchBooksByName")
+    @Operation(summary = "Search books by name")
+    public ResponseEntity<List<Book>> searchBooksByName(@RequestParam String partOfName) {
         var books = bookService.findBooksByNameContaining(partOfName);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @GetMapping("/getBookByName")
-    @Operation(summary = "Possibility to get book by name")
+    @Operation(summary = "Get book by name")
     public ResponseEntity<BookDTO> getBookByName(@RequestParam String name) {
         var book = bookService.mapToDTO(bookService.findBookByName(name).orElseThrow(() -> new EntityNotFoundException("Book with this name not found")));
         return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
     @GetMapping("/searchByAuthor")
-    @Operation(summary = "Possibility to search books by author")
-    public ResponseEntity<List<Book>> searchBookByAuthor(@RequestParam String author) {
+    @Operation(summary = "Search books by author")
+    public ResponseEntity<List<Book>> searchBooksByAuthor(@RequestParam String author) {
         var books = bookService.findBooksByAuthorContaining(author);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
-    @GetMapping("/sortBookByPriceAsc")
-    @Operation(summary = "Possibility to sort books by price asc")
-    public ResponseEntity<List<Book>> findBooksByPriceAsc() {
+    @GetMapping("/sortByPriceAsc")
+    @Operation(summary = "Sort books by price (ascending)")
+    public ResponseEntity<List<Book>> sortBooksByPriceAsc() {
         var sortedBooks = bookService.findBooksByOrderByPriceAsc();
         return new ResponseEntity<>(sortedBooks, HttpStatus.OK);
     }
 
-    @GetMapping("/sortBookByPriceDesc")
-    @Operation(summary = "Possibility to sort books by price asc")
-    public ResponseEntity<List<Book>> findBooksByPriceDesc() {
+    @GetMapping("/sortByPriceDesc")
+    @Operation(summary = "Sort books by price (descending)")
+    public ResponseEntity<List<Book>> sortBooksByPriceDesc() {
         var sortedBooks = bookService.findBooksByOrderByPriceDesc();
         return new ResponseEntity<>(sortedBooks, HttpStatus.OK);
     }
 
-    @DeleteMapping("/deleteBookById/{bookId}")
-    @Operation(summary = "Possibility to delete a book by id")
+    @DeleteMapping("/delete/{bookId}")
+    @Operation(summary = "Delete a book by ID")
     public ResponseEntity<Void> deleteBookById(@PathVariable("bookId") UUID bookId) {
         bookService.deleteById(bookId);
         return new ResponseEntity<>(HttpStatus.OK);
