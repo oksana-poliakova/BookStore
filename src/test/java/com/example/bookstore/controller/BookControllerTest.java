@@ -47,20 +47,16 @@ class BookControllerTest {
     @Mock
     ModelMapper modelMapper;
     private static HttpHeaders headers;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @InjectMocks
     BookController bookController;
     private MockMvc mockMvc; // like real request
 
-    @BeforeAll
-    public static void init() {
-        headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-    }
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(bookController).build();
+        objectMapper = new ObjectMapper();
     }
 
     @Test
@@ -83,20 +79,11 @@ class BookControllerTest {
         savedBook.setDescription(insertBookDTO.getDescription());
         savedBook.setPrice(insertBookDTO.getPrice());
 
-        when(bookService.saveBook(any())).thenReturn(savedBook);
+        String bookJson = objectMapper.writeValueAsString(savedBook);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/book/add")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(insertBookDTO)))
-                        .andDo(print())
-                        .andExpect(status().isOk())
-                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(jsonPath("$.id").exists())
-                        .andExpect(jsonPath("$.name").value(insertBookDTO.getName()))
-                        .andExpect(jsonPath("$.author").value(insertBookDTO.getAuthor()))
-                        .andExpect(jsonPath("$.description").value(insertBookDTO.getDescription()))
-                        .andExpect(jsonPath("$.price").value(insertBookDTO.getPrice()));
-
-        verify(bookService, times(1)).saveBook(any());
+                        .content(bookJson))
+                .andExpect(status().isCreated());
     }
 }

@@ -35,10 +35,12 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/add")
     @Operation(summary = "Possibility to add a book to the database")
-    public BookDTO save(@Valid @RequestBody InsertBookDTO insertBookDTO) {
-        return bookService.mapToDTO(bookService.saveBook(insertBookDTO));
+    // Void instead of BookDTO ???
+    public ResponseEntity<Void> save(@Valid @RequestBody InsertBookDTO insertBookDTO) {
+        bookService.mapToDTO(bookService.saveBook(insertBookDTO));
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/{bookId}")
